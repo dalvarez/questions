@@ -11,18 +11,22 @@ var questions = {
 
     var defaultOptions = {
       view: "Main View",
-      maxRecords: 10
+      maxRecords: 50,
+      pageSize: 20
     };
 
     options = utils.extend(defaultOptions, options);
-
+console.log('options are now ', options);
     var questions = [];
     var question;
 
     async.waterfall([
         function(waterfallCallback) {
           //get questions and massage the data
-          base('Questions').select(options).eachPage(function page(records, fetchNextPage){
+          // base('Questions').select(options).firstPage(function(error, records){
+          base('Questions')
+          .select(options)
+          .eachPage(function page(records, fetchNextPage){
             records.forEach(function(record) {
               question = {
                 choiceIds: {},

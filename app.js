@@ -21,8 +21,10 @@ app.use(sassMiddleware({
 app.get('/', function(request, response){
 
   var options = {
-    filterByFormula: 'difficulty = 3',
-    maxRecords: 5
+    // filterByFormula: '(SEARCH("Stoichiometry",topics))> 0',
+    // filterByFormula: 'AND((FIND("Stoichiometry",topics))> 0,(FIND("Mass Spec",topics))> 0)'
+    maxRecords: 10,
+    pageSize: 2
   };
   questions.all(options, function(error, result){
     console.log('caller with the done: ');
