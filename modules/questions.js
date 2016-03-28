@@ -1,12 +1,20 @@
 "use strict";
 
+var utils = require('./utils');
 var async = require('async');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 
 var questions = {
-  all: function(done, options){
+  all: function(options, done){
     options = options || {};
+
+    var defaultOptions = {
+      view: "Main View",
+      maxRecords: 10
+    };
+
+    options = utils.extend(defaultOptions, options);
 
     var questions = [];
     var question;
@@ -14,10 +22,7 @@ var questions = {
     async.waterfall([
         function(waterfallCallback) {
           //get questions and massage the data
-          base('Questions').select({
-            maxRecords: 10,
-            view: "Main View"
-          }).eachPage(function page(records, fetchNextPage){
+          base('Questions').select(options).eachPage(function page(records, fetchNextPage){
             records.forEach(function(record) {
               question = {
                 choiceIds: {},
