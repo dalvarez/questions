@@ -112,7 +112,7 @@ app.get('/', function(request, response){
   ], function (err, result) {
       // result now equals 'questions'
       // console.log('waterfall done, results are ', result);
-      response.render('questions',{questions: result});
+      response.render('pages/index',{questions: result});
       //draw the panels here - we need the list of formed questions to do it
   });
 

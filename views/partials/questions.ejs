@@ -1,5 +1,3 @@
-
-<main>
 <% questions.forEach(function(question){ %>
   <div class="panel">
     <p class="question-text"> <%- question.text %> </p>
@@ -7,12 +5,12 @@
       <img src=<%=question.image%> />
     <%}%>
 
-    <ul>
+    <ul class="choices">
       <% for(key in question.choices){ %>
         <% if (question.choices.hasOwnProperty(key)) {%>
           <% var choice = question.choices[key]%>
-          <li>
-            <p><%- choice.text%></p>
+          <li class="choice">
+            <p class="choice-text"><%- choice.text%></p>
             <% if(choice.image) {%>
               <img src=<%=choice.image%> />
             <%}%>
@@ -22,4 +20,3 @@
     </ul>
   </div>
 <% }); %>
-</main>
