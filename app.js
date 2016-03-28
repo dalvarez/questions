@@ -53,10 +53,8 @@ app.get('/', function(request, response){
       function(questions, waterfallCallback) {
           //find all the choices
           var asyncTasks = [];
-          // var choiceIds, key;
 
           questions.forEach(function(question){
-// console.log('the current question is ', question);
             let choiceIds = question.choiceIds;
             for(let key in choiceIds){
               if(choiceIds.hasOwnProperty(key)){
@@ -64,7 +62,6 @@ app.get('/', function(request, response){
                 let choiceKey = key;
                 asyncTasks.push(function(parallelCallback){
                   base('Choices').find(choiceIds[choiceKey], function(err, record){
-                    // console.log('the choiceId is ', choiceIds[choiceKey]);
                     if(record.get('text'))
                       question.choices[choiceKey] = { 'text': record.get('text') };
                     if(record.get('imageID')){
@@ -80,8 +77,6 @@ app.get('/', function(request, response){
           async.parallel(asyncTasks, function(err, results) {
             waterfallCallback(null, questions);
           });
-
-          // callback(null, questions);
       },
       function(questions, waterfallCallback) {
           //find all the images
@@ -90,7 +85,6 @@ app.get('/', function(request, response){
 
           questions.forEach(function(question){
             let imageIds = question.imageIds;
-// console.log('imageIds are ', imageIds);
             for(var key in imageIds){
               if(imageIds.hasOwnProperty(key)){
                 let imageKey = key;
@@ -114,7 +108,6 @@ app.get('/', function(request, response){
             waterfallCallback(null, questions);
           });
 
-          // callback(null, questions);
       }
   ], function (err, result) {
       // result now equals 'questions'
@@ -123,67 +116,6 @@ app.get('/', function(request, response){
       //draw the panels here - we need the list of formed questions to do it
   });
 
-  // var questions = [];
-  // var panels = [];
-  // var question;
-  //
-  // base('Questions').select({
-  //     // Selecting the first 3 records in Main View:
-  //     maxRecords: 4,
-  //     view: "Main View"
-  // }).eachPage(function page(records, fetchNextPage) {
-  //     // This function (`page`) will get called for each page of records.
-  //     records.forEach(function(record) {
-  //       question = {};
-  //       question.text = record.get('text');
-  //       question.choices = [];
-  //       if(record.get('choiceAID'))
-  //         question.choices.push(record.get('choiceAID'));
-  //       if(record.get('choiceBID'))
-  //         question.choices.push(record.get('choiceBID'));
-  //       if(record.get('choiceCID'))
-  //         question.choices.push(record.get('choiceCID'));
-  //       if(record.get('choiceDID'))
-  //         question.choices.push(record.get('choiceDID'));
-  //       if(record.get('choiceEID'))
-  //         question.choices.push(record.get('choiceEID'));
-  //       if(record.get('imageID'))
-  //         question.imageId = record.get('imageID');
-  //
-  //       questions.push(question);
-  //     });
-  //     fetchNextPage();
-  // }, function done(error) {
-  //     if (error) {
-  //         console.log(error);
-  //     }
-  //
-  //   ///ASYNC TEST GOES HERE
-  //
-  //   var asyncTasks = [];
-  //   var images = [];
-  //
-  //   questions.forEach(function(question){
-  //     asyncTasks.push(function(callback){
-  //       if(question.imageId){
-  //         console.log('this question has an image');
-  //         base('Images').find(question.imageId, function(err, record){
-  //           images.push(record.get('attachedImage')[0].url);
-  //           callback('image captured!');
-  //         });
-  //       }
-  //     });
-  //   });
-  //
-  //   async.parallel(asyncTasks, function(err, results) {
-  //     // console.log(results);
-  //     console.log('all the tasks are done');
-  //     console.log('there are these many images', images.length);
-  //     console.log('and the image is ', images[0]);
-  //     response.render('questions', {questions: questions});
-  //   });
-  //
-  // }); // End of eachPage();
 
 }); // END of app.get '/'
 
