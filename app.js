@@ -3,9 +3,19 @@
 var async = require('async');
 var express = require('express');
 var app = express();
+var path = require('path');
+var sassMiddleware = require('node-sass-middleware');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 app.set('view engine', 'ejs');
+app.use(sassMiddleware({
+    /* Options */
+    src: __dirname + "/public/styles/sass",
+    dest: __dirname + "/public/styles/css",
+    // debug: true,
+    outputStyle: 'compressed',
+    prefix:  '/public/styles/css'
+}));
 
 app.get('/', function(request, response){
   var questions = [];
