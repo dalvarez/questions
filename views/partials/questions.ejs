@@ -1,22 +1,51 @@
 <% questions.forEach(function(question){ %>
-  <div class="panel">
-    <p class="question-text"> <%- question.text %> </p>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title"> <%- question.text %> </h3>
+    </div>
     <% if(question.image) {%>
-      <img src=<%=question.image%> />
+      <img class="question-image" src=<%=question.image%> />
     <%}%>
 
-    <ul class="choices">
+    <div class="row">
       <% for(key in question.choices){ %>
         <% if (question.choices.hasOwnProperty(key)) {%>
           <% var choice = question.choices[key]%>
-          <li class="choice">
-            <p class="choice-text"><%- choice.text%></p>
-            <% if(choice.image) {%>
-              <img src=<%=choice.image%> />
-            <%}%>
-          </li>
+          <div class="col-xs-6 col-md-15 choice">
+          <div class="thumbnail">
+          <% if(choice.image) {%>
+            <img src=<%=choice.image%> />
+          <%}%>
+            <div class="caption">
+              <h5>
+              <% if(choice.text) {%>
+                <%- choice.text%>
+              <%}%>
+              </h5>
+            </div>
+          </div>
+          </div>
         <%}%>
       <% }; %>
-    </ul>
+    </div>
+
+
+
+<!--
+//vertical choices
+    // <ul class="list-group">
+    //   <% for(key in question.choices){ %>
+    //     <% if (question.choices.hasOwnProperty(key)) {%>
+    //       <% var choice = question.choices[key]%>
+    //       <li class="list-group-item">
+    //         <p class="choice-text"><%- choice.text%></p>
+    //         <% if(choice.image) {%>
+    //           <img src=<%=choice.image%> />
+    //         <%}%>
+    //       </li>
+    //     <%}%>
+    //   <% }; %>
+    // </ul>
+    -->
   </div>
 <% }); %>
