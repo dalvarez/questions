@@ -34,6 +34,10 @@ console.log('options are now ', options);
                 choices: {}
               };
               question.text = record.get('text');
+              question.difficulty = record.get('difficulty')[0];
+              question.topics = record.get('topics');
+              question.questionNumber = record.get('questionNumber');
+              
               if(record.get('choiceAID'))
                 question.choiceIds.choiceA = record.get('choiceAID')[0];
               if(record.get('choiceBID'))
