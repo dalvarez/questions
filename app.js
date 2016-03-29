@@ -3,9 +3,19 @@
 var async = require('async');
 var express = require('express');
 var app = express();
+var sassMiddleware = require('node-sass-middleware');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 app.set('view engine', 'ejs');
+app.use(express.static('./public'));
+app.use(sassMiddleware({
+    /* Options */
+    src: __dirname + "/public/styles/sass",
+    dest: __dirname + "/public/styles/css",
+    // debug: true,
+    outputStyle: 'compressed',
+    prefix:  '/public/styles/css'
+}));
 
 app.get('/', function(request, response){
   var questions = [];
@@ -112,7 +122,7 @@ app.get('/', function(request, response){
   ], function (err, result) {
       // result now equals 'questions'
       // console.log('waterfall done, results are ', result);
-      response.render('questions',{questions: result});
+      response.render('pages/index',{questions: result});
       //draw the panels here - we need the list of formed questions to do it
   });
 

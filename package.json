@@ -12,6 +12,7 @@
     "airtable": "^0.4.0",
     "async": "^2.0.0-rc.2",
     "ejs": "^2.4.1",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "node-sass-middleware": "^0.9.7"
   }
 }
