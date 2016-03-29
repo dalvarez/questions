@@ -8,6 +8,7 @@ var sassMiddleware = require('node-sass-middleware');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 app.set('view engine', 'ejs');
+app.use(express.static('./public'));
 app.use(sassMiddleware({
     /* Options */
     src: __dirname + "/public/styles/sass",
