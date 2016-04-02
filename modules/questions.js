@@ -6,7 +6,7 @@ var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 
 var questions = {
-  all: function(options, done){
+  all: function(options, doneCallback){
     options = options || {};
 
     var defaultOptions = {
@@ -16,119 +16,58 @@ var questions = {
     };
 
     options = utils.extend(defaultOptions, options);
-console.log('options are now ', options);
-    var questions = [];
-    var question;
-
-    async.waterfall([
-        function(waterfallCallback) {
-          //get questions and massage the data
-          // base('Questions').select(options).firstPage(function(error, records){
-          base('Questions')
-          .select(options)
-          .eachPage(function page(records, fetchNextPage){
-            records.forEach(function(record) {
-              question = {
-                choiceIds: {},
-                imageIds: {},
-                choices: {}
-              };
-              question.text = record.get('text');
-              question.difficulty = record.get('difficulty')[0];
-              question.topics = record.get('topics');
-              question.questionNumber = record.get('questionNumber');
-              
-              if(record.get('choiceAID'))
-                question.choiceIds.choiceA = record.get('choiceAID')[0];
-              if(record.get('choiceBID'))
-                question.choiceIds.choiceB = record.get('choiceBID')[0];
-              if(record.get('choiceCID'))
-                question.choiceIds.choiceC = record.get('choiceCID')[0];
-              if(record.get('choiceDID'))
-                question.choiceIds.choiceD = record.get('choiceDID')[0];
-              if(record.get('choiceEID'))
-                question.choiceIds.choiceE = record.get('choiceEID')[0];
-              if(record.get('imageID'))
-                question.imageIds.questionImageId = record.get('imageID')[0];
-
-              questions.push(question);
-            });
-
-            fetchNextPage();
-          }, function done(error){
-            if(error){
-              console.log('something went wrong fetching questions ', error);
-              //callback(error);
+        base('Questions')
+        .select(options)
+        .eachPage(function page(records, fetchNextPage){
+          var questions = [];
+          var question;
+          records.forEach(function(record) {
+            question = {
+              choices: {}
+            };
+            question.text = record.get('text');
+            question.difficulty = record.get('difficulty')[0];
+            question.topics = record.get('topics');
+            question.questionNumber = record.get('questionNumber');
+            if (record.get('questionImage')) {
+              question.image = record.get('questionImage')[0].url;
             }
-            waterfallCallback(null, questions);
+            question.choices.choiceA = utils.extend({}, {
+                text: record.get('choiceAText'),
+                image: record.get('choiceAImage') ? record.get('choiceAImage')[0].url : undefined,
+            });
+            question.choices.choiceB = utils.extend({}, {
+                text: record.get('choiceBText'),
+                image: record.get('choiceBImage') ? record.get('choiceBImage')[0].url : undefined,
+            });
+            question.choices.choiceC = utils.extend({}, {
+                text: record.get('choiceCText'),
+                image: record.get('choiceCImage') ? record.get('choiceCImage')[0].url : undefined,
+            });
+            question.choices.choiceD = utils.extend({}, {
+                text: record.get('choiceDText'),
+                image: record.get('choiceDImage') ? record.get('choiceDImage')[0].url : undefined,
+            });
+            question.choices.choiceE = utils.extend({}, {
+                text: record.get('choiceEText'),
+                image: record.get('choiceEImage') ? record.get('choiceEImage')[0].url : undefined,
+            });
+
+            questions.push(question);
           });
-        },
-        function(questions, waterfallCallback) {
-            //find all the choices
-            var asyncTasks = [];
+          // waterfallCallback(null, questions, fetchNextPage);
+          doneCallback(null, questions, fetchNextPage);
 
-            questions.forEach(function(question){
-              let choiceIds = question.choiceIds;
-              for(let key in choiceIds){
-                if(choiceIds.hasOwnProperty(key)){
+          // fetchNextPage();
+        }, function done(error){
+          if(error){
+            console.log('something went wrong fetching questions ', error);
+            //callback(error);
+          }
+            console.log('no more records');
+            doneCallback(null, questions, null);
+          }); //end of eachPage()
 
-                  let choiceKey = key;
-                  asyncTasks.push(function(parallelCallback){
-                    base('Choices').find(choiceIds[choiceKey], function(err, record){
-                      if(record.get('text'))
-                        question.choices[choiceKey] = { 'text': record.get('text') };
-                      if(record.get('imageID')){
-                        question.imageIds[choiceKey] = record.get('imageID')[0];
-                      }
-                      parallelCallback(null, 'choice captured!');
-                    });
-                  });
-                }
-              }
-            });
-
-            async.parallel(asyncTasks, function(err, results) {
-              waterfallCallback(null, questions);
-            });
-        },
-        function(questions, waterfallCallback) {
-            //find all the images
-            var asyncTasks = [];
-            let image;
-
-            questions.forEach(function(question){
-              let imageIds = question.imageIds;
-              for(var key in imageIds){
-                if(imageIds.hasOwnProperty(key)){
-                  let imageKey = key;
-                  asyncTasks.push(function(parallelCallback){
-                    base('Choices').find(imageIds[imageKey], function(err, record){
-                      image = record.get('attachedImage')[0].url;
-                      if(imageKey === "questionImageId")
-                        question.image = image;
-                      else
-                        question.choices[imageKey]['image'] = image;
-
-                      parallelCallback(null, 'image captured!');
-                    });
-                  });
-                }
-              }
-            });
-
-            async.parallel(asyncTasks, function(err, results) {
-              console.log('All images gathered.');
-              waterfallCallback(null, questions);
-            });
-
-        }
-    ], function (err, result) {
-        // result now equals 'questions'
-        console.log('waterfall done, results are ', result);
-        done(null, result);
-        // response.render('questions',{questions: result});
-        //draw the panels here - we need the list of formed questions to do it
-    });
   }
 };
 

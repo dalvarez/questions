@@ -10,21 +10,69 @@
 
     <link rel="stylesheet" href="/public/styles/css/app.css" >
     <script src="/scripts/jquery-2.2.2.min.js"></script>
+    <script src="/scripts/ejs.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body class="container">
 
   <h2>Chemistry 1Ad Exam Question Database (BETA)</h2>
 PRINT GOES HERE
 FILTERS GO HERE
-
+   <nav>
+      <ul class="pager">
+          <li><a class="previousPageButton" href="#">Previous Page</a></li>
+          <li><a class="nextPageButton" href="#">Next Page</a></li>
+      </ul>
+    </nav>
     <main>
-        <% include ../partials/questions %>
+        <% if(questions !== undefined) {%>
+          <% include ../partials/questions %>
+        <%}%>
     </main>
-
+    <nav>
+       <ul class="pager">
+           <li><a class="previousPageButton" href="#">Previous Page</a></li>
+           <li><a class="nextPageButton" href="#">Next Page</a></li>
+       </ul>
+     </nav>
     <footer>
         <img src="/images/logo.jpg" alt="" />
     </footer>
-
+    <script type="text/javascript">
+    "use strict";
+      var socket = io();
+      socket.on('connect', function(){
+        console.log('Client: connected to server!');
+      });
+      $('.nextPageButton').on('click', function(){
+        console.log('next page button was clicked');
+        socket.emit('nextPage');
+      });
+      //Server sends the next page
+      socket.on('nextPage', function(data){
+        //render the ejs questions template
+        if(data.currentPage === 1){
+          $('.previousPageButton').hide();
+        } else {
+          $('.previousPageButton').show();
+        }
+        console.log('client hears the next page and now has some questions');
+        $('main').html(data.questions);
+      });
+      $('.previousPageButton').on('click', function(){
+        console.log('previous page button was clicked');
+        socket.emit('previousPage');
+      });
+      socket.on('previousPage', function(data){
+        if(data.currentPage === 1){
+          $('.previousPageButton').hide();
+        } else {
+          $('.previousPageButton').show();
+        }
+        $('main').html(data.questions);
+      });
+    </script>
 </body>
 </html>
