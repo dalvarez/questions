@@ -58,6 +58,11 @@ FILTERS GO HERE
         } else {
           $('.previousPageButton').show();
         }
+        if(data.showNextButton)
+          $('.nextPageButton').show();
+        else
+          $('.nextPageButton').hide();
+
         console.log('client hears the next page and now has some questions');
         $('main').html(data.questions);
       });
@@ -71,6 +76,10 @@ FILTERS GO HERE
         } else {
           $('.previousPageButton').show();
         }
+        if(data.showNextButton)
+          $('.nextPageButton').show();
+        else
+          $('.nextPageButton').hide();
         $('main').html(data.questions);
       });
     </script>

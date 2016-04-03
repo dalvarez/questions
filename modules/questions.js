@@ -4,7 +4,7 @@ var utils = require('./utils');
 var async = require('async');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
-
+let pageNumber = 0;
 var questions = {
   all: function(options, doneCallback){
     options = options || {};
@@ -21,6 +21,7 @@ var questions = {
         .eachPage(function page(records, fetchNextPage){
           var questions = [];
           var question;
+          pageNumber++;
           records.forEach(function(record) {
             question = {
               choices: {}
@@ -56,7 +57,7 @@ var questions = {
             questions.push(question);
           });
           // waterfallCallback(null, questions, fetchNextPage);
-          doneCallback(null, questions, fetchNextPage);
+          doneCallback(null, questions, pageNumber, fetchNextPage);
 
           // fetchNextPage();
         }, function done(error){
@@ -64,8 +65,8 @@ var questions = {
             console.log('something went wrong fetching questions ', error);
             //callback(error);
           }
-            console.log('no more records');
-            doneCallback(null, questions, null);
+            console.log('no more records to fetch');
+            doneCallback(null, [], null, null);
           }); //end of eachPage()
 
   }

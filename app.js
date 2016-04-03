@@ -8,6 +8,11 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var sassMiddleware = require('node-sass-middleware');
 var questionsDB = require('./modules/questions');
+let options = {
+  maxRecords: 10,
+  pageSize: 3
+};
+
 app.set('view engine', 'ejs');
 app.use(express.static('./public'));
 app.use(sassMiddleware({
@@ -21,59 +26,82 @@ app.use(sassMiddleware({
 app.locals.fetchNextPage = null;
 app.locals.pages = {};
 app.locals.currentPage = 1;
-let sendNextPage = null;
+
 var templateFile = fs.readFileSync(__dirname + '/views/partials/questions.ejs', 'utf8');
-// var templateFile = '<div>hi mom</div';
+
 let questionsTemplate = ejs.compile(templateFile);
 let newHTML = '';
 
 io.on('connection', function(client){
   console.log('Client connected...');
-  //Client asking for the next page
-  client.on('nextPage', function(){
-    //need to make sure that this will be unique to each client
 
-    app.locals.currentPage++;
+  let sendNextPage = function(){
+    console.log('sending the page to the client');
+    let showNextButton = app.locals.pages[app.locals.currentPage + 1] !== undefined ? true : false;
+    console.log('showNextButton?', showNextButton);
+    newHTML = questionsTemplate({questions: app.locals.pages[app.locals.currentPage]});
+    client.emit('nextPage', {questions: newHTML, currentPage: app.locals.currentPage, showNextButton: showNextButton});
+  };
+
+  let cacheResults = function(questions, pageNumber){
+    console.log('caching questions');
+    app.locals.pages[pageNumber] = questions;
     if(app.locals.pages[app.locals.currentPage] !== undefined){
       console.log('grabbing next page from cache');
       sendNextPage();
-    } else {
-      console.log('calling fetchNextPage');
+    }
+    if(app.locals.pages[app.locals.currentPage + 1] === undefined
+    && app.locals.fetchNextPage !== null ){
+      //need to pre-fetch the next page
       app.locals.fetchNextPage();
     }
+    else {
+      if(app.locals.currentPage === 1)
+        sendNextPage();
+    }
+  };
+
+  client.on('nextPage', function(){
+    //need to make sure that this will be unique to each client
+    app.locals.currentPage++;
+    if(app.locals.pages[app.locals.currentPage + 1] === undefined
+    && app.locals.fetchNextPage !== null ){
+      console.log('calling fetchNextPage');
+      app.locals.fetchNextPage();
+    } else {
+      if(app.locals.pages[app.locals.currentPage] !== undefined){
+        console.log('grabbing next page from cache');
+        sendNextPage();
+      }
+    }
+
+
   });
 
   client.on('previousPage', function(){
     app.locals.currentPage--;
     newHTML = questionsTemplate({questions: app.locals.pages[app.locals.currentPage]});
-    client.emit('previousPage', {questions: newHTML, currentPage: app.locals.currentPage})
+    client.emit('previousPage', {questions: newHTML, currentPage: app.locals.currentPage, showNextButton: true});
   });
 
-  sendNextPage = function(){
-    console.log('sending the page to the client');
-    newHTML = questionsTemplate({questions: app.locals.pages[app.locals.currentPage]});
-    client.emit('nextPage', {questions: newHTML, currentPage: app.locals.currentPage});
-  }
-
-  let options = {
-    maxRecords: 1000,
-    pageSize: 10
-  };
-
-  questionsDB.all(options, function(error, result, fetchNextPage){
+  questionsDB.all(options, function(error, questions, pageNumber, fetchNextPage){
     console.log('questionsDB callback here');
-    console.log('currentPage is ', app.locals.currentPage);
-    app.locals.pages[app.locals.currentPage] = result;
-    app.locals.fetchNextPage = fetchNextPage;
-    //this assumes that socket.io is already connected...
-    sendNextPage();
+    console.log('current page is ', app.locals.currentPage);
+    if(fetchNextPage === null){
+      //no more pages
+      console.log('database has no more pages');
+      sendNextPage();
+    } else {
+      //maybe do this if not null, only
+      app.locals.fetchNextPage = fetchNextPage;
+      cacheResults(questions, pageNumber);
+      // sendNextPage();
+    }
   });
 });
 app.get('/', function(request, response){
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
-
-
 
 
 server.listen('3000', function(){
