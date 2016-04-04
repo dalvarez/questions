@@ -9,8 +9,8 @@ var io = require('socket.io')(server);
 var sassMiddleware = require('node-sass-middleware');
 var questionsDB = require('./modules/questions');
 let options = {
-  maxRecords: 10,
-  pageSize: 3
+  maxRecords: 1000,
+  pageSize: 10
 };
 
 app.set('view engine', 'ejs');
@@ -25,7 +25,7 @@ app.use(sassMiddleware({
 }));
 app.locals.fetchNextPage = null;
 app.locals.pages = {};
-app.locals.currentPage = 1;
+// app.locals.currentPage = 1;
 
 var templateFile = fs.readFileSync(__dirname + '/views/partials/questions.ejs', 'utf8');
 
@@ -34,42 +34,46 @@ let newHTML = '';
 
 io.on('connection', function(client){
   console.log('Client connected...');
+  let currentPage = 1;
+  // let pages = {};
+  // let fetchNextPage = null;
+
 
   let sendNextPage = function(){
     console.log('sending the page to the client');
-    let showNextButton = app.locals.pages[app.locals.currentPage + 1] !== undefined ? true : false;
+    let showNextButton = app.locals.pages[currentPage + 1] !== undefined ? true : false;
     console.log('showNextButton?', showNextButton);
-    newHTML = questionsTemplate({questions: app.locals.pages[app.locals.currentPage]});
-    client.emit('nextPage', {questions: newHTML, currentPage: app.locals.currentPage, showNextButton: showNextButton});
+    newHTML = questionsTemplate({questions: app.locals.pages[currentPage]});
+    client.emit('nextPage', {questions: newHTML, currentPage: currentPage, showNextButton: showNextButton});
   };
 
   let cacheResults = function(questions, pageNumber){
     console.log('caching questions');
     app.locals.pages[pageNumber] = questions;
-    if(app.locals.pages[app.locals.currentPage] !== undefined){
+    if(app.locals.pages[currentPage] !== undefined){
       console.log('grabbing next page from cache');
       sendNextPage();
     }
-    if(app.locals.pages[app.locals.currentPage + 1] === undefined
+    if(app.locals.pages[currentPage + 1] === undefined
     && app.locals.fetchNextPage !== null ){
       //need to pre-fetch the next page
       app.locals.fetchNextPage();
     }
     else {
-      if(app.locals.currentPage === 1)
+      if(currentPage === 1)
         sendNextPage();
     }
   };
 
   client.on('nextPage', function(){
     //need to make sure that this will be unique to each client
-    app.locals.currentPage++;
-    if(app.locals.pages[app.locals.currentPage + 1] === undefined
+    currentPage++;
+    if(app.locals.pages[currentPage + 1] === undefined
     && app.locals.fetchNextPage !== null ){
       console.log('calling fetchNextPage');
       app.locals.fetchNextPage();
     } else {
-      if(app.locals.pages[app.locals.currentPage] !== undefined){
+      if(app.locals.pages[currentPage] !== undefined){
         console.log('grabbing next page from cache');
         sendNextPage();
       }
@@ -79,21 +83,21 @@ io.on('connection', function(client){
   });
 
   client.on('previousPage', function(){
-    app.locals.currentPage--;
-    newHTML = questionsTemplate({questions: app.locals.pages[app.locals.currentPage]});
-    client.emit('previousPage', {questions: newHTML, currentPage: app.locals.currentPage, showNextButton: true});
+    currentPage--;
+    newHTML = questionsTemplate({questions: app.locals.pages[currentPage]});
+    client.emit('previousPage', {questions: newHTML, currentPage: currentPage, showNextButton: true});
   });
 
-  questionsDB.all(options, function(error, questions, pageNumber, fetchNextPage){
+  questionsDB.all(options, function(error, questions, pageNumber, nextPageFn){
     console.log('questionsDB callback here');
-    console.log('current page is ', app.locals.currentPage);
-    if(fetchNextPage === null){
+    console.log('current page is ', currentPage);
+    if(nextPageFn === null){
       //no more pages
       console.log('database has no more pages');
       sendNextPage();
     } else {
       //maybe do this if not null, only
-      app.locals.fetchNextPage = fetchNextPage;
+      app.locals.fetchNextPage = nextPageFn;
       cacheResults(questions, pageNumber);
       // sendNextPage();
     }
