@@ -1,9 +1,10 @@
 {
   "name": "chem1ad",
   "version": "1.0.0",
-  "description": "Experiment",
+  "description": "Application for the chem1ad course.",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Danny Alvarez",
@@ -15,5 +16,13 @@
     "express": "^4.13.4",
     "node-sass-middleware": "^0.9.7",
     "socket.io": "^1.4.5"
+  },
+  "engines": {
+    "node": "4.4.1",
+    "npm": "^2.14.20" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dalvarez/questions"
   }
 }

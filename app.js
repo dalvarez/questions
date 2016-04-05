@@ -28,15 +28,17 @@ app.use(sassMiddleware({
     prefix:  '/public/styles/css'
 }));
 
-questionsDB.all(options, function(error, pages){
-  console.log('All of the questions are cached.');
-});
 
+server.listen(process.env.PORT || '3000', function(){
+  console.log('we\'re listening now');
+});
 app.get('/', function(request, response){
   console.log('initial rendering');
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
-
+questionsDB.all(options, function(error, pages){
+  console.log('All of the questions are cached.');
+});
 io.on('connection', function(client){
   console.log('Client connected...');
   let currentPageNumber = 1;
@@ -67,10 +69,4 @@ io.on('connection', function(client){
   });
 
   getPage(currentPageNumber);
-});
-
-
-
-server.listen('3000', function(){
-  console.log('we\'re listening now');
 });
