@@ -29,16 +29,16 @@ app.use(sassMiddleware({
 }));
 
 
-server.listen('5000', function(){
+server.listen(process.env.PORT || '3000', function(){
   console.log('we\'re listening now');
 });
 app.get('/', function(request, response){
   console.log('initial rendering');
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
-// questionsDB.all(options, function(error, pages){
-//   console.log('All of the questions are cached.');
-// });
+questionsDB.all(options, function(error, pages){
+  console.log('All of the questions are cached.');
+});
 io.on('connection', function(client){
   console.log('Client connected...');
   let currentPageNumber = 1;
