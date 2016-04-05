@@ -2,11 +2,19 @@
   <div class="panel panel-primary">
     <div class="panel-heading">
       <h3 class="panel-title"><%=question.questionNumber%>. <%- question.text %> </h3>
-      <% question.topics.forEach(function(topic){ %>
-        <span class="label label-success"><%= topic %> </span>
-      <%});%>
-      Difficulty: <span class="badge"><%= question.difficulty %></span>
+
+      <% if (question.topics){%>
+        <% question.topics.forEach(function(topic){ %>
+          <span class="label label-success"><%= topic %> </span>
+        <%});%>
+      <%}%>
+
+      <%if(question.difficulty) {%>
+        Difficulty: <span class="badge"><%= question.difficulty %></span>
+      <%}%>
+
     </div>
+
     <% if(question.image) {%>
       <img class="question-image" src=<%=question.image%> />
     <%}%>
@@ -16,18 +24,20 @@
         <% if (question.choices.hasOwnProperty(key)) {%>
           <% var choice = question.choices[key]%>
           <div class="col-xs-6 col-md-15 choice">
-          <div class="thumbnail">
-          <% if(choice.image) {%>
-            <img src=<%=choice.image%> />
-          <%}%>
-            <div class="caption">
-              <h5>
-              <% if(choice.text) {%>
-                <%- choice.text%>
+            <div class="thumbnail">
+
+              <% if(choice.image) {%>
+                <img src=<%=choice.image%> />
               <%}%>
-              </h5>
+
+              <div class="caption">
+                <h5>
+                  <% if(choice.text) {%>
+                    <%- choice.text%>
+                  <%}%>
+                </h5>
+              </div>
             </div>
-          </div>
           </div>
         <%}%>
       <% }; %>
