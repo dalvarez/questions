@@ -1,3 +1,6 @@
+$berkeleyBlue: #003262;
+$californiaGold: #FDB515;
+
 body h2{
   text-align: center;
 }
@@ -34,6 +37,18 @@ body h2{
 }
 
 .panel{
+  border-color: $berkeleyBlue;
+  .panel-heading{
+    background-color: $berkeleyBlue;
+    border-color: $berkeleyBlue;
+
+    .label{
+      margin-right: 5px;
+      color: $berkeleyBlue;
+      background-color: $californiaGold;
+    }
+  }
+
   .question-image{
     max-width:40%;
     margin: 15px auto;

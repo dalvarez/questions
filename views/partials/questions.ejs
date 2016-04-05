@@ -1,7 +1,11 @@
 <% questions.forEach(function(question){ %>
   <div class="panel panel-primary">
     <div class="panel-heading">
-      <h3 class="panel-title"> <%- question.text %> </h3>
+      <h3 class="panel-title"><%=question.questionNumber%>. <%- question.text %> </h3>
+      <% question.topics.forEach(function(topic){ %>
+        <span class="label label-success"><%= topic %> </span>
+      <%});%>
+      Difficulty: <span class="badge"><%= question.difficulty %></span>
     </div>
     <% if(question.image) {%>
       <img class="question-image" src=<%=question.image%> />
