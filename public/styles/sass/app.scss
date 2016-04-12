@@ -36,6 +36,18 @@ body h2{
     }
 }
 
+.dropdown{
+  ul a.selected{
+    .glyphicon-ok{
+      display:inline-block;
+    }
+  }
+  .glyphicon-ok{
+    float:right;
+    display:none;
+  }
+}
+
 .panel{
   border-color: $berkeleyBlue;
   .panel-heading{

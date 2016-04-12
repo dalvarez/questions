@@ -7,8 +7,9 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var sassMiddleware = require('node-sass-middleware');
+var path = require('path');
 let questionsDB = require('./modules/questions');
-let options = {
+app.locals.options = {
   maxRecords: 1000,
   pageSize: 20
 };
@@ -18,27 +19,30 @@ let questionsTemplate = ejs.compile(templateFile);
 let newHTML = '';
 
 app.set('view engine', 'ejs');
-app.use(express.static('./public'));
+
 app.use(sassMiddleware({
     /* Options */
     src: __dirname + "/public/styles/sass",
     dest: __dirname + "/public/styles/css",
-    // debug: true,
+    debug: true,
     outputStyle: 'compressed',
     prefix:  '/public/styles/css'
 }));
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 server.listen(process.env.PORT || '3000', function(){
   console.log('we\'re listening now');
 });
+
 app.get('/', function(request, response){
   console.log('initial rendering');
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
-questionsDB.all(options, function(error, pages){
+
+questionsDB.all(app.locals.options, function(error, pages){
   console.log('All of the questions are cached.');
 });
+
 io.on('connection', function(client){
   console.log('Client connected...');
   let currentPageNumber = 1;
@@ -47,7 +51,7 @@ io.on('connection', function(client){
   let sendPage = function(page, showPrevious, showNext){
     console.log('sendPage was called');
     newHTML = questionsTemplate({questions: page});
-    client.emit('newPage', {questionsHTML: newHTML, showPrevious: showPrevious, showNext: showNext});
+    client.emit('newPage', {questionsHTML: newHTML, showPrevious: showPrevious, showNext: showNext, fullJson: questionsDB.pages});
   };
 
   let getPage = function(currentPageNumber){
@@ -69,4 +73,29 @@ io.on('connection', function(client){
   });
 
   getPage(currentPageNumber);
+
+  client.on('filter', function(filterObject){
+    //add that to a questionsDB.filters objext
+    questionsDB.filters.difficulty = (filterObject.difficulty);
+    console.log('questionsDB filters is now ', questionsDB.filters);
+    var filtered = questionsDB.filterPages(questionsDB.filters, app.locals.options);
+
+    questionsDB.filteredPages = filtered;
+    client.emit('nowFiltered', questionsDB.filteredPages);
+    //call the filtersPage
+      //maybe swap pages with filtersPage?
+      //this may affect all clients, so maybe store filtered on the client side
+    //load page 1 by calling sendPage
+    // sendPage(questionsDB.filteredPages[1], false, true);
+    currentPageNumber = 1;
+    getPage(currentPageNumber);
+  });
+
+  client.on('clearFilters', function(){
+    questionsDB.filters = {};
+    questionsDB.filteredPages = {};
+    currentPageNumber = 1;
+    getPage(currentPageNumber);
+  });
+
 });

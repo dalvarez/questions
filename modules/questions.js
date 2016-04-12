@@ -2,22 +2,75 @@
 
 var utils = require('./utils');
 var Airtable = require('airtable');
+var _ = require('underscore');
 var base = new Airtable({ apiKey: 'keyDSIKXybboB4yTY' }).base('appfeRWL1dYhKSR9E');
 let pageNumber = 0;
 
 var questions = {
   pages: {},
 
+  filters: {
+    difficulty: [],
+    topics: []
+  },
+
+  filteredPages: {},
+
   getPage: function(number, callback){
     console.log('getPage was called');
-    let that = this;
-    let data = {};
-    if(that.pages[number] !== undefined){
-      data.page = that.pages[number];
+
+    //TODO: naive check, should do better
+    if(this.filteredPages[1] && this.filteredPages[1].length > 0){
+      let data = {};
+      if(this.filteredPages[number] !== undefined){
+        data.page = this.filteredPages[number];
+      }
+      data.showNext = this.filteredPages[number + 1] !== undefined;
+      data.showPrevious = this.filteredPages[number - 1] !== undefined;
+      callback(data);
+    } else {
+      let data = {};
+      if(this.pages[number] !== undefined){
+        data.page = this.pages[number];
+      }
+      data.showNext = this.pages[number + 1] !== undefined;
+      data.showPrevious = this.pages[number - 1] !== undefined;
+      callback(data);
+
     }
-    data.showNext = that.pages[number + 1] !== undefined;
-    data.showPrevious = that.pages[number - 1] !== undefined;
-    callback(data);
+  },
+
+  filterPages: function(filters, options){
+console.log('filterPages was called with ', filters);
+    var tempPages = [];
+    var filteredPages = {};
+    var chunk = options.pageSize;
+    let i, page;
+    for(page in this.pages){
+      if(this.pages.hasOwnProperty(page)){
+        var temp = _.filter(this.pages[page], function(question){
+          let difficulty = true;
+          let topics = true;
+          if(filters.difficulty.length > 0){
+            difficulty = filters.difficulty.indexOf(question.difficulty) > -1;
+          }
+          if(filters.topics.length > 0){
+            topics = _.intersection(filters.topics, question.topics).length > 0;
+          }
+
+            return difficulty && topics;
+        });
+
+        tempPages = tempPages.concat(temp);
+      }
+    }
+
+    for (i=0; i<tempPages.length; i+=chunk) {
+        var pageNumber = (i+chunk)/chunk;
+        filteredPages[pageNumber] = tempPages.slice(i,i+chunk);
+    }
+
+    return filteredPages;
   },
 
   all: function(options, doneCallback){
@@ -46,7 +99,7 @@ var questions = {
         };
         question.text = record.get('text');
         if(record.get('difficulty')){
-          question.difficulty = record.get('difficulty')[0];
+          question.difficulty = parseInt(record.get('difficulty')[0], 10);
         }
         question.topics = record.get('topics');
         question.questionNumber = record.get('questionNumber');
