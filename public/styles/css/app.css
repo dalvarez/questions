@@ -26,6 +26,14 @@ body h2 {
   .col-lg-15 {
     width: 20%;
     float: left; } }
+/*********************
+*
+* Filters
+*
+*********************/
+#clearFilters {
+  display: none; }
+
 .dropdown {
   display: inline-block; }
   .dropdown .glyphicon-ok {
@@ -40,6 +48,11 @@ body h2 {
       top: 6px;
       right: 8px; }
 
+/**********************
+*
+* Question Panels
+*
+***********************/
 .panel {
   border-color: #003262; }
   .panel .panel-heading {

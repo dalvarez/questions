@@ -9,24 +9,17 @@ let pageNumber = 0;
 var questions = {
   pages: {},
 
-  filters: {
-    difficulty: [],
-    topics: []
-  },
-
-  filteredPages: {},
-
-  getPage: function(number, callback){
+  getPage: function(filteredPages, number, callback){
     console.log('getPage was called');
 
     //TODO: naive check, should do better
-    if(this.filteredPages[1] && this.filteredPages[1].length > 0){
+    if(filteredPages[1] && filteredPages[1].length > 0){
       let data = {};
-      if(this.filteredPages[number] !== undefined){
-        data.page = this.filteredPages[number];
+      if(filteredPages[number] !== undefined){
+        data.page = filteredPages[number];
       }
-      data.showNext = this.filteredPages[number + 1] !== undefined;
-      data.showPrevious = this.filteredPages[number - 1] !== undefined;
+      data.showNext = filteredPages[number + 1] !== undefined;
+      data.showPrevious = filteredPages[number - 1] !== undefined;
       callback(data);
     } else {
       let data = {};
@@ -41,7 +34,6 @@ var questions = {
   },
 
   filterPages: function(filters, options){
-console.log('filterPages was called with ', filters);
     var tempPages = [];
     var filteredPages = {};
     var chunk = options.pageSize;

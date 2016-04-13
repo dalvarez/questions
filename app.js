@@ -37,10 +37,6 @@ server.listen(process.env.PORT || '3000', function(){
 app.get('/', function(request, response){
   console.log('initial rendering');
 
-  //clear out filters ?
-  questionsDB.filters = {};
-  questionsDB.filteredPages = {};
-
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
 
@@ -51,7 +47,11 @@ questionsDB.all(app.locals.options, function(error, pages){
 io.on('connection', function(client){
   console.log('Client connected...');
   let currentPageNumber = 1;
-  // let currentPage = null;
+  let clientFilters =  {
+      difficulty: [],
+      topics: []
+  };
+  let clientFilteredPages = {};
 
   let sendPage = function(page, showPrevious, showNext){
     console.log('sendPage was called');
@@ -60,7 +60,7 @@ io.on('connection', function(client){
   };
 
   let getPage = function(currentPageNumber){
-    questionsDB.getPage(currentPageNumber, function(data){
+    questionsDB.getPage(clientFilteredPages, currentPageNumber, function(data){
       sendPage(data.page, data.showPrevious, data.showNext);
     });
   };
@@ -68,37 +68,34 @@ io.on('connection', function(client){
   client.on('nextPage', function(){
     console.log('nextPage was called');
     currentPageNumber = currentPageNumber + 1;
+    console.log('current page number is ', currentPageNumber);
     getPage(currentPageNumber);
   });
 
   client.on('previousPage', function(){
     console.log('previousPage was called');
     currentPageNumber = currentPageNumber - 1;
+    console.log('current page number is ', currentPageNumber);
     getPage(currentPageNumber);
   });
 
   getPage(currentPageNumber);
 
   client.on('filter', function(filterObject){
-    //add that to a questionsDB.filters objext
-    questionsDB.filters = filterObject;
-    console.log('questionsDB filters is now ', questionsDB.filters);
-    var filtered = questionsDB.filterPages(questionsDB.filters, app.locals.options);
+    clientFilters = filterObject;
+    console.log('client filters is now ', clientFilters);
+    clientFilteredPages = questionsDB.filterPages(clientFilters, app.locals.options);
 
-    questionsDB.filteredPages = filtered;
-    client.emit('nowFiltered', questionsDB.filteredPages);
-    //call the filtersPage
-      //maybe swap pages with filtersPage?
-      //this may affect all clients, so maybe store filtered on the client side
-    //load page 1 by calling sendPage
-    // sendPage(questionsDB.filteredPages[1], false, true);
     currentPageNumber = 1;
     getPage(currentPageNumber);
   });
 
   client.on('clearFilters', function(){
-    questionsDB.filters = {};
-    questionsDB.filteredPages = {};
+    clientFilters =  {
+        difficulty: [],
+        topics: []
+    };
+    clientFilteredPages = {};
     currentPageNumber = 1;
     getPage(currentPageNumber);
   });

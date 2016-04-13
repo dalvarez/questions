@@ -36,6 +36,15 @@ body h2{
     }
 }
 
+/*********************
+*
+* Filters
+*
+*********************/
+#clearFilters{
+  display: none;
+}
+
 .dropdown{
   display: inline-block;
 
@@ -56,6 +65,12 @@ body h2{
     }
   }
 }
+
+/**********************
+*
+* Question Panels
+*
+***********************/
 
 .panel{
   border-color: $berkeleyBlue;

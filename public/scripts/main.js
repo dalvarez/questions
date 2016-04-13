@@ -33,14 +33,12 @@
 
 // Filters //
   $('.filter .dropdown-menu').on('click', function(event){
-    //toggle selected on the current one
-    //grab all selected and put into array
-    //if array length >0, send them to be filtered
-    $(event.target).toggleClass('selected');
     let filterObject = {
       difficulty: [],
       topics:[]
     };
+
+    $(event.target).toggleClass('selected');
 
     $('#difficulty-filter .dropdown-menu li a.selected').each(function(index){
       filterObject.difficulty.push(parseInt($(this).text() ,10));
@@ -49,19 +47,18 @@
       filterObject.topics.push($(this).text());
     });
 
-    // let selectedDifficulties = ;
-    // var difficultChoice = parseInt($(this).text(), 10);
-    // var filterObject = {
-    //   difficulty: difficultChoice
-    // };
-
-    console.log('filterObject is now ', filterObject);
-    if(filterObject.difficulty.length > 0 || filterObject.topics.length > 0)
+    if(filterObject.difficulty.length > 0 || filterObject.topics.length > 0){
       socket.emit('filter', filterObject);
-    else
+      $('#clearFilters').show();
+    }
+    else{
       socket.emit('clearFilters');
+      $('#clearFilters').hide();
+    }
   });
 
-  socket.on('nowFiltered', function(filtered){
-    console.log('filtered is ', filtered);
+  $('#clearFilters').on('click', function(){
+    socket.emit('clearFilters');
+    $('.selected').removeClass('selected');
+    $('#clearFilters').hide();
   });
