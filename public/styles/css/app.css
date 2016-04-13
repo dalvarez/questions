@@ -1,1 +1,82 @@
-body h2{text-align:center}.col-xs-15,.col-sm-15,.col-md-15,.col-lg-15{position:relative;min-height:1px;padding-right:10px;padding-left:10px}.col-xs-15{width:20%;float:left}@media (min-width: 768px){.col-sm-15{width:20%;float:left}}@media (min-width: 992px){.col-md-15{width:20%;float:left}}@media (min-width: 1200px){.col-lg-15{width:20%;float:left}}.panel{border-color:#003262}.panel .panel-heading{background-color:#003262;border-color:#003262}.panel .panel-heading .label{margin-right:5px;color:#003262;background-color:#FDB515}.panel .question-image{max-width:40%;margin:15px auto;display:block}.panel .row{margin:15px 0}.panel .row .choice{text-align:center;padding-right:15px;padding-left:15px}.panel .row .choice .thumbnail{margin-bottom:0}.panel .row .choice .thumbnail img{max-width:90%}footer img{display:block;margin:0 auto}
+body h2 {
+  text-align: center; }
+
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 10px;
+  padding-left: 10px; }
+
+.col-xs-15 {
+  width: 20%;
+  float: left; }
+
+@media (min-width: 768px) {
+  .col-sm-15 {
+    width: 20%;
+    float: left; } }
+@media (min-width: 992px) {
+  .col-md-15 {
+    width: 20%;
+    float: left; } }
+@media (min-width: 1200px) {
+  .col-lg-15 {
+    width: 20%;
+    float: left; } }
+/*********************
+*
+* Filters
+*
+*********************/
+#clearFilters {
+  display: none; }
+
+.dropdown {
+  display: inline-block; }
+  .dropdown .glyphicon-ok {
+    float: right;
+    display: none; }
+  .dropdown .dropdown-menu > li > a {
+    padding: 3px 30px;
+    position: relative; }
+    .dropdown .dropdown-menu > li > a.selected .glyphicon-ok {
+      display: inline-block;
+      position: absolute;
+      top: 6px;
+      right: 8px; }
+
+/**********************
+*
+* Question Panels
+*
+***********************/
+.panel {
+  border-color: #003262; }
+  .panel .panel-heading {
+    background-color: #003262;
+    border-color: #003262; }
+    .panel .panel-heading .label {
+      margin-right: 5px;
+      color: #003262;
+      background-color: #fdb515; }
+  .panel .question-image {
+    max-width: 40%;
+    margin: 15px auto;
+    display: block; }
+  .panel .row {
+    margin: 15px 0; }
+    .panel .row .choice {
+      text-align: center;
+      padding-right: 15px;
+      padding-left: 15px; }
+      .panel .row .choice .thumbnail {
+        margin-bottom: 0; }
+        .panel .row .choice .thumbnail img {
+          max-width: 90%; }
+
+footer img {
+  display: block;
+  margin: 0 auto; }

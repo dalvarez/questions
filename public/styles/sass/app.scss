@@ -36,6 +36,42 @@ body h2{
     }
 }
 
+/*********************
+*
+* Filters
+*
+*********************/
+#clearFilters{
+  display: none;
+}
+
+.dropdown{
+  display: inline-block;
+
+  .glyphicon-ok{
+    float:right;
+    display:none;
+  }
+
+  .dropdown-menu>li>a{
+    padding: 3px 30px;
+    position: relative;
+
+    &.selected .glyphicon-ok{
+      display:inline-block;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+    }
+  }
+}
+
+/**********************
+*
+* Question Panels
+*
+***********************/
+
 .panel{
   border-color: $berkeleyBlue;
   .panel-heading{

@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="/styles/css/app.css" >
     <script src="/scripts/jquery-2.2.2.min.js"></script>
+    <script src="/scripts/underscore.min.js"></script>
     <script src="/scripts/ejs.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
 
@@ -19,7 +20,7 @@
 
   <h2>Chemistry 1Ad Exam Question Database (BETA)</h2>
 
-    <%# include ../partials/filters %>
+    <% include ../partials/filters %>
 
    <nav>
       <ul class="pager">
@@ -41,32 +42,6 @@
     <footer>
         <img src="/images/logo.jpg" alt="" />
     </footer>
-    <script type="text/javascript">
-    "use strict";
-      var socket = io();
-      socket.on('connect', function(){
-        console.log('Client: connected to server!');
-      });
-      socket.on('newPage', function(data){
-        if(data.showPrevious)
-          $('.previousPageButton').show();
-        else
-          $('.previousPageButton').hide();
-
-        if(data.showNext)
-          $('.nextPageButton').show();
-        else
-          $('.nextPageButton').hide();
-
-          $('main').html(data.questionsHTML);
-      });
-
-      $('.nextPageButton').on('click', function(){
-        socket.emit('nextPage');
-      });
-      $('.previousPageButton').on('click', function(){
-        socket.emit('previousPage');
-      });
-    </script>
+    <script src="/scripts/main.js"></script>
 </body>
 </html>
