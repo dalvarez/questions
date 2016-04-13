@@ -26,11 +26,19 @@ body h2 {
   .col-lg-15 {
     width: 20%;
     float: left; } }
-.dropdown ul a.selected .glyphicon-ok {
+.dropdown {
   display: inline-block; }
-.dropdown .glyphicon-ok {
-  float: right;
-  display: none; }
+  .dropdown .glyphicon-ok {
+    float: right;
+    display: none; }
+  .dropdown .dropdown-menu > li > a {
+    padding: 3px 30px;
+    position: relative; }
+    .dropdown .dropdown-menu > li > a.selected .glyphicon-ok {
+      display: inline-block;
+      position: absolute;
+      top: 6px;
+      right: 8px; }
 
 .panel {
   border-color: #003262; }

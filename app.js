@@ -36,6 +36,11 @@ server.listen(process.env.PORT || '3000', function(){
 
 app.get('/', function(request, response){
   console.log('initial rendering');
+
+  //clear out filters ?
+  questionsDB.filters = {};
+  questionsDB.filteredPages = {};
+
   response.render('pages/index', {questions: undefined, questionsTemplate: questionsTemplate});
 }); // END of app.get '/'
 
@@ -76,7 +81,7 @@ io.on('connection', function(client){
 
   client.on('filter', function(filterObject){
     //add that to a questionsDB.filters objext
-    questionsDB.filters.difficulty = (filterObject.difficulty);
+    questionsDB.filters = filterObject;
     console.log('questionsDB filters is now ', questionsDB.filters);
     var filtered = questionsDB.filterPages(questionsDB.filters, app.locals.options);
 

@@ -32,17 +32,21 @@
 
 
 // Filters //
-  $('#difficulty-filter .dropdown-menu').on('click', function(event){
+  $('.filter .dropdown-menu').on('click', function(event){
     //toggle selected on the current one
     //grab all selected and put into array
     //if array length >0, send them to be filtered
     $(event.target).toggleClass('selected');
     let filterObject = {
-      difficulty: []
+      difficulty: [],
+      topics:[]
     };
+
     $('#difficulty-filter .dropdown-menu li a.selected').each(function(index){
-//show selected state here?
       filterObject.difficulty.push(parseInt($(this).text() ,10));
+    });
+    $('#topic-filter .dropdown-menu li a.selected').each(function(index){
+      filterObject.topics.push($(this).text());
     });
 
     // let selectedDifficulties = ;
@@ -52,7 +56,7 @@
     // };
 
     console.log('filterObject is now ', filterObject);
-    if(filterObject.difficulty.length > 0)
+    if(filterObject.difficulty.length > 0 || filterObject.topics.length > 0)
       socket.emit('filter', filterObject);
     else
       socket.emit('clearFilters');
