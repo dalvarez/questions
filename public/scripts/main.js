@@ -33,7 +33,7 @@
 
 // Filters //
   $('.filter .dropdown-menu').on('click', function(event){
-    let filterObject = {
+    var filterObject = {
       difficulty: [],
       topics:[]
     };
